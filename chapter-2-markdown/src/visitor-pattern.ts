@@ -1,5 +1,7 @@
 import { IMarkdownDocument } from './markdown-document';
-import { TagType, TagTypeToHtml } from './markdown-parser';
+import { TagTypeToHtml } from './markdown-parser';
+import { TagType } from './tag-type';
+import { ParseElement } from './line-parser';
 
 interface IVisitor {
   Visit(token: ParseElement, markdownDocument: IMarkdownDocument): void;

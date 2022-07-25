@@ -1,6 +1,7 @@
 class LinerParser {
   Parse(value: string, tag: string): [boolean, string] {
-    let output: [boolean, string] = [false, value];
+    let output: [boolean, string] = [false, ''];
+    output[1] = value;
     if (value === '') {
       return output;
     }

@@ -1,5 +1,6 @@
-import { TagType, TagTypeToHtml } from './markdown-parser';
+import { TagTypeToHtml } from './tag-2-html';
 import { VisitorBase } from './visitor-pattern';
+import { TagType } from './tag-type';
 
 class Header1Visitor extends VisitorBase {
   constructor() {

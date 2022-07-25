@@ -5,6 +5,7 @@ export interface IMarkdownDocument {
 
 export class MarkdownDocument implements IMarkdownDocument {
   private content: string = '';
+
   Add(...content: Array<string>) {
     content.forEach((element) => {
       this.content += element;

@@ -1,4 +1,6 @@
 import { MarkdownDocument, IMarkdownDocument } from './markdown-document';
+import { ParseChainHandler } from './responsible-chain';
+
 import {
   Header1ChainHandler,
   Header2ChainHandler,
@@ -7,38 +9,6 @@ import {
   ParagraphHandler,
 } from './concrete-chain-responsibility';
 import { ParseElement } from './line-parser';
-
-export enum TagType {
-  Paragraph,
-  Header1,
-  Header2,
-  Header3,
-  HorizontalRule,
-}
-export class TagTypeToHtml {
-  private readonly tagType: Map<TagType, string> = new Map();
-  constructor() {
-    this.tagType.set(TagType.Paragraph, 'p');
-    this.tagType.set(TagType.Header1, 'h1');
-    this.tagType.set(TagType.Header2, 'h2');
-    this.tagType.set(TagType.Header3, 'h3');
-    this.tagType.set(TagType.HorizontalRule, 'hr');
-  }
-
-  OpeningTag(tagType: TagType): string {
-    return this.getTag(tagType, '<');
-  }
-  ClosingTag(tagType: TagType): string {
-    return this.getTag(tagType, '</');
-  }
-  private getTag(tagType: TagType, openingTagPattern: string) {
-    let tag = this.tagType.get(tagType);
-    if (tag !== null) {
-      return `${openingTagPattern}${tag}>`;
-    }
-    return `${openingTagPattern}p>`;
-  }
-}
 
 class ChainOfResponsibilityFactory {
   Build(document: IMarkdownDocument): ParseChainHandler {
@@ -62,12 +32,13 @@ class Markdown {
     let document = new MarkdownDocument();
     let header1 = new ChainOfResponsibilityFactory().Build(document);
 
-    let lines = text.split('\n');
+    let lines = text.split(`\n`);
     for (let index = 0; index < lines.length; index++) {
       let parseElement = new ParseElement();
       parseElement.CurrentLine = lines[index];
       header1.HandleRequest(parseElement);
     }
+
     return document.Get();
   }
 }
@@ -88,6 +59,7 @@ class HtmlHandler {
     }
   }
   private RenderHtmlContent(markdown: HTMLTextAreaElement, markdownOutput: HTMLLabelElement) {
+    console.log('markdown value: ', markdown.value);
     if (markdown.value) {
       markdownOutput.innerHTML = this.markdownChange.ToHtml(markdown.value);
     } else {

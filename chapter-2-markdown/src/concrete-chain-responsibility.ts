@@ -8,22 +8,23 @@ import {
   ParagraphVisitor,
 } from './concrete-visitor';
 import { Visitable, IVisitable, IVisitor } from './visitor-pattern';
+import { ParseElement } from './line-parser';
 
 class Header1ChainHandler extends ParseChainHandler {
   constructor(document: IMarkdownDocument) {
-    super(document, '#', new Header1Visitor());
+    super(document, '# ', new Header1Visitor());
   }
 }
 
 class Header2ChainHandler extends ParseChainHandler {
   constructor(document: IMarkdownDocument) {
-    super(document, '##', new Header2Visitor());
+    super(document, '## ', new Header2Visitor());
   }
 }
 
 class Header3ChainHandler extends ParseChainHandler {
   constructor(document: IMarkdownDocument) {
-    super(document, '###', new Header3Visitor());
+    super(document, '### ', new Header3Visitor());
   }
 }
 
