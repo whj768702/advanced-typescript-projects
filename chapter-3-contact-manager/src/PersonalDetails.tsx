@@ -118,9 +118,10 @@ export default class PersonalDetails extends React.Component<IProps, IPersonStat
     const state = { ...this.state, ...personState };
     if (state.PersonId === '') {
       state.PersonId = Date.now().toString();
-      this.dataLayer.Create(state);
-      this.loadPeople();
-      this.clear();
+      this.dataLayer.Create(state).then((_) => {
+        this.loadPeople();
+        this.clear();
+      });
     } else {
       this.dataLayer.Update(state).then((_) => this.loadPeople());
     }

@@ -12,9 +12,17 @@ export class Database<T extends RecordState> {
     this.OpenDatabase();
   }
 
-  Create(state: T): void {
-    const dbStore = this.GetObjectStore();
-    dbStore!.add(state);
+  Create(state: T): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const dbStore = this.GetObjectStore();
+      const innerRequest: IDBRequest = dbStore!.add(state);
+      innerRequest.onsuccess = () => {
+        resolve();
+      };
+      innerRequest.onerror = () => {
+        reject();
+      };
+    });
   }
 
   Read(): Promise<T[]> {
