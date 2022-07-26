@@ -1,10 +1,12 @@
+import { RecordState } from './RecordSate';
+
 export type StringOrNull = string | null;
 
 export interface IPersonState {
   FirstName: string;
   LastName: string;
   Address1: string;
-  Address2: StringOrNull;
+  Address2: string;
   Town: string;
   County: string;
   PhoneNumber: string;
@@ -16,3 +18,5 @@ export interface IPersonState {
 export interface IProps {
   DefaultState: IPersonState;
 }
+
+export type PersonRecord = RecordState & IPersonState;

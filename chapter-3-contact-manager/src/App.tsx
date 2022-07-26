@@ -7,7 +7,7 @@ import { IPersonState } from './Types';
 export default class App extends React.Component {
   private defaultPerson: IPersonState = {
     Address1: '',
-    Address2: null,
+    Address2: '',
     County: '',
     DateOfBirth: new Date().toISOString().substring(0, 10),
     FirstName: '',

@@ -1,89 +1,53 @@
-import { IPersonState, StringOrNull } from './Types';
+import React from 'react';
+import { Col, Row } from 'reactstrap';
+import { IPersonState } from './Types';
+import { AddressValidation } from './Validation/AddressValidation';
+import { IValidation } from './Validation/IValidation';
+import { PersonValidation } from './Validation/PersonValidation';
+import { PhoneValidation } from './Validation/PhoneValidation';
 
-interface IValidator<T> {
-  IsValid(input: T): void;
+interface IValidationProps {
+  CurrentState: IPersonState;
+  CanSave: (canSave: boolean) => void;
 }
 
-export class MinLengthValidator implements IValidator<StringOrNull> {
-  private minLength: number;
+export default class FormValidation extends React.Component<IValidationProps, {}> {
+  private failures = new Array<string>();
+  private validation: IValidation[];
 
-  constructor(minLength: number) {
-    this.minLength = minLength;
+  constructor(props: IValidationProps) {
+    super(props);
+    this.validation = new Array<IValidation>();
+    this.validation.push(new PersonValidation());
+    this.validation.push(new AddressValidation());
+    this.validation.push(new PhoneValidation());
   }
 
-  IsValid(input: StringOrNull): boolean {
-    if (!input) {
-      return false;
-    }
-    return input.length >= this.minLength;
+  private Validate() {
+    this.failures = []; // 每次验证前清空老的验证状态
+    this.validation.forEach((validation) => {
+      validation.Validate(this.props.CurrentState, this.failures);
+    });
+
+    this.props.CanSave(this.failures.length === 0);
   }
-}
 
-export class RegularExpressionValidator implements IValidator<StringOrNull> {
-  private regex: RegExp;
-  constructor(expression: string) {
-    this.regex = new RegExp(expression);
-  }
-  IsValid(input: StringOrNull): boolean {
-    if (!input) {
-      return false;
-    }
-    return this.regex.test(input);
-  }
-}
-
-export interface IValidation {
-  Validate(state: IPersonState, errors: string[]): void;
-}
-
-export class AddressValidation implements IValidation {
-  private readonly minLengthValidator: MinLengthValidator = new MinLengthValidator(5);
-
-  private readonly zipCodeValidator: RegularExpressionValidator = new RegularExpressionValidator(
-    '^[0-9]{5}(?:-[0-9]{4})$'
-  );
-
-  Validate(state: IPersonState, errors: string[]) {
-    if (!this.minLengthValidator.IsValid(state.Address1)) {
-      errors.push('Address line 1 must be greater  than 5 characters');
-    }
-    if (!this.minLengthValidator.IsValid(state.Town)) {
-      errors.push('Town must be greater  than 5 characters');
-    }
-    if (!this.minLengthValidator.IsValid(state.County)) {
-      errors.push('County must be greater  than 5 characters');
-    }
-    if (!this.zipCodeValidator.IsValid(state.Postcode)) {
-      errors.push('The postal/zip code is invalid');
-    }
-  }
-}
-
-export class PersonValidation implements IValidation {
-  private readonly firstNameValidator: MinLengthValidator = new MinLengthValidator(1);
-  private readonly lastNameValidator: MinLengthValidator = new MinLengthValidator(2);
-
-  Validate(state: IPersonState, errors: string[]) {
-    if (!this.firstNameValidator.IsValid(state.FirstName)) {
-      errors.push('First name must be greater than 1 character');
-    }
-    if (!this.lastNameValidator.IsValid(state.LastName)) {
-      errors.push('Last name must be greater than 2 characters');
-    }
-  }
-}
-
-export class PhoneValidation implements IValidation {
-  private readonly regexValidator: RegularExpressionValidator = new RegularExpressionValidator(
-    '^(?([0-9]{3}))?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$'
-  );
-  private readonly minLengthValidator: MinLengthValidator = new MinLengthValidator(1);
-
-  Validate(state: IPersonState, errors: string[]) {
-    if (!this.minLengthValidator.IsValid(state.PhoneNumber)) {
-      errors.push('Phone number must be greater than 1 character');
-    } else if (!this.regexValidator.IsValid(state.PhoneNumber)) {
-      errors.push('Phone number must be in the format xxx-xxx-xxxx');
-    }
+  render() {
+    this.Validate();
+    const errors = this.failures.map((failure) => {
+      return (
+        <Row key={failure}>
+          <Col>
+            <label className="text-danger text-opacity-75">{failure}</label>
+          </Col>
+        </Row>
+      );
+    });
+    return (
+      <>
+        <h3 className="text-danger">Errors</h3>
+        <Col>{errors}</Col>;
+      </>
+    );
   }
 }
